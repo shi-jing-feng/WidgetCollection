@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 文本颜色 -->
+    <attr name="textColor" format="color|reference" />
+    <!-- 文本大小 -->
+    <attr name="textSize" format="dimension|reference" />
+    <!-- 背景颜色 -->
+    <attr name="bgColor" format="color|reference" />
+    <!-- 圆角半径 -->
+    <attr name="cornerRadius" format="dimension|reference" />
+
+    <!-- 进度环 -->
+    <declare-styleable name="ProgressRing">
+        <!-- 进度环颜色 -->
+        <attr name="ringColor" format="color|reference" />
+        <!-- 背景环颜色 -->
+        <attr name="backgroundRingColor" format="color|reference" />
+        <!-- 文本颜色 -->
+        <attr name="textColor" />
+        <!-- 进度环厚度 -->
+        <attr name="thickness" format="dimension|reference" />
+        <!--
+        自定义文本 (如果为 null, 那么就显示默认进度文本)
+        注: 文本中的 {@link ProgressRing#PROGRESS_VALUE} 代表当前进度(百分比值进度 或 数值进度)
+        -->
+        <attr name="customText" format="string|reference" />
+        <!-- 文本大小 -->
+        <attr name="textSize" />
+        <!-- 文本是否可见  true 可见  false 不可见 -->
+        <attr name="textVisible" format="boolean" />
+        <!-- 设置文本是否加粗  true 加粗  false 不加粗 -->
+        <attr name="textBold" format="boolean" />
+        <!-- 进度环当前进度 -->
+        <attr name="curProgress" format="float" />
+        <!-- 进度环总进度 -->
+        <attr name="totalProgress" format="float" />
+        <!-- 进度类型 -->
+        <attr name="progressType" format="enum">
+            <!-- 百分比类型 -->
+            <enum name="percent" value="0" />
+            <!-- 数值类型 -->
+            <enum name="value" value="1" />
+        </attr>
+        <!-- 进度方向 -->
+        <attr name="progressDirection" format="enum">
+            <!-- 顺时针 -->
+            <enum name="cw" value="0" />
+            <!-- 逆时针 -->
+            <enum name="ccw" value="1" />
+        </attr>
+        <attr name="startPosition" format="enum">
+            <!-- 顶部 -->
+            <enum name="top" value="0" />
+            <!-- 底部 -->
+            <enum name="bottom" value="1" />
+            <!-- 左部 -->
+            <enum name="left" value="2" />
+            <!-- 右部 -->
+            <enum name="right" value="3" />
+        </attr>
+    </declare-styleable>
+
+    <!-- MarkerView -->
+    <declare-styleable name="MarkerView">
+        <!-- 文本 -->
+        <attr name="text" format="string|reference" />
+        <!-- 文本颜色 -->
+        <attr name="textColor" />
+        <!-- 文本大小 -->
+        <attr name="textSize" />
+        <!-- 背景颜色 -->
+        <attr name="bgColor" />
+        <!-- 圆角半径 -->
+        <attr name="cornerRadius" />
+        <!-- 缺失的三角形(整体的三角形缩小版)的腰长(等腰三角形) -->
+        <attr name="missing_triangle_waist_length" format="dimension|reference" />
+        <!-- 纵轴偏移距离 (小于0: 向上偏移  大于0: 向下偏移) -->
+        <attr name="offset" format="dimension|reference" />
+        <!-- 位置 -->
+        <attr name="position" format="enum">
+            <!-- 处于左上角位置 -->
+            <enum name="left_top" value="0" />
+            <!-- 处于左下角位置 -->
+            <enum name="left_bottom" value="1" />
+            <!-- 处于右上角位置 -->
+            <enum name="right_top" value="2" />
+            <!-- 处于右下角位置 -->
+            <enum name="right_bottom" value="3" />
+        </attr>
+        <!-- 样式 -->
+        <attr name="marker_view_style" format="enum">
+            <!-- 等腰三角形 -->
+            <enum name="triangle" value="0" />
+            <!-- 圆角等腰三角形 -->
+            <enum name="cornerTriangle" value="1" />
+            <!-- 梯形 -->
+            <enum name="missingTriangle" value="2" />
+        </attr>
+    </declare-styleable>
+
+    <!-- IsoscelesTriangleView -->
+    <declare-styleable name="IsoscelesTriangleView">
+        <!-- 颜色 -->
+        <attr name="color" format="color|reference" />
+        <!-- 样式 -->
+        <attr name="isosceles_triangle_style" format="enum">
+            <!-- 以两腰之间的尖端开始，从顶部到底部 (垂直方向正三角形) -->
+            <enum name="top_to_bottom" value="0" />
+            <!-- 以两腰之间的尖端开始，从底部到顶部 (垂直方向倒三角形) -->
+            <enum name="bottom_to_top" value="1" />
+            <!-- 以两腰之间的尖端开始，从左部到右部 (水平方向正三角形) -->
+            <enum name="left_to_right" value="2" />
+            <!-- 以两腰之间的尖端开始，从右部到左部 (水平方向倒三角形) -->
+            <enum name="right_to_left" value="3" />
+        </attr>
+    </declare-styleable>
+
+    <!-- FlowLayout -->
+    <declare-styleable name="FlowLayout">
+        <!-- 排列方向 -->
+        <attr name="flowOrientation" format="enum">
+            <!-- 排列方向: 逐行排列, 可上下滚动 -->
+            <enum name="vertical" value="0" />
+            <!-- 排列方向: 逐列排列, 可左右滚动 -->
+            <enum name="horizontal" value="1" />
+        </attr>
+        <!-- Child所处的位置 -->
+        <attr name="flowGravity" format="enum">
+            <!-- Child所处的位置: {@link FlowOrientation#HORIZONTAL}: 水平居中  {@link FlowOrientation#VERTICAL}: 垂直居中 -->
+            <enum name="center" value="0" />
+            <!-- Child所处的位置: 顶部  用于{@link FlowOrientation#VERTICAL} -->
+            <enum name="top" value="1" />
+            <!-- Child所处的位置: 底部  用于{@link FlowOrientation#VERTICAL} -->
+            <enum name="bottom" value="2" />
+            <!-- Child所处的位置: 左部  用于{@link FlowOrientation#HORIZONTAL} -->
+            <enum name="left" value="3" />
+            <!-- Child所处的位置: 右部  用于{@link FlowOrientation#HORIZONTAL} -->
+            <enum name="right" value="4" />
+        </attr>
+    </declare-styleable>
+
+</resources>
