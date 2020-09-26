@@ -139,4 +139,40 @@
         </attr>
     </declare-styleable>
 
+    <!-- 气泡背景 -->
+    <declare-styleable name="BubbleBackgroundView">
+        <!-- 箭头宽 -->
+        <attr name="arrowWidth" format="dimension|reference" />
+        <!-- 箭头高 -->
+        <attr name="arrowHeight" format="dimension|reference" />
+        <!-- 箭头方向 -->
+        <attr name="arrowDirection" format="enum">
+            <!-- 顶部 -->
+            <enum name="top" value="0" />
+            <!-- 底部 -->
+            <enum name="bottom" value="1" />
+            <!-- 左部 -->
+            <enum name="left" value="2" />
+            <!-- 右部 -->
+            <enum name="right" value="3" />
+        </attr>
+        <!-- 从控件坐标轴原点 (包括阴影距离) 到 箭头中心点 的距离 (可能是水平距离，也可能是垂直距离，取决于箭头位置) -->
+        <attr name="arrowDistanceFromOrigin" format="dimension|reference" />
+        <!-- 圆角半径 -->
+        <attr name="cornerRadius" />
+        <!-- 背景颜色 -->
+        <attr name="bgColor" />
+
+        <!-- 是否显示阴影  true: 显示  false: 不显示 -->
+        <attr name="showShadow" format="boolean" />
+        <!-- 阴影半径 -->
+        <attr name="shadowRadius" format="dimension|reference" />
+        <!-- 阴影水平偏移量 (正值向右偏移，负值向左偏移) -->
+        <attr name="shadowDx" format="dimension|reference" />
+        <!-- 阴影垂直偏移量 (正值向下偏移，负值向上偏移) -->
+        <attr name="shadowDy" format="dimension|reference" />
+        <!-- 阴影颜色 -->
+        <attr name="shadowColor" format="color|reference" />
+    </declare-styleable>
+
 </resources>
