@@ -32,6 +32,10 @@ class FlowLayout @JvmOverloads constructor(
     @FlowOrientation private var mOrientation = FLOW_ORIENTATION_VERTICAL
     /** Child所处的位置 */
     @FlowGravity private var mGravity = FLOW_GRAVITY_CENTER
+    /** 行间隔 (注: 会和 topMargin, bottomMargin 叠加) */
+    private var mRawSpace = 0
+    /** 列间隔 (注: 会和 leftMargin(getMarginStart()), rightMargin(getMarginEnd()) 叠加) */
+    private var mColumnSpace = 0
 
     /**
      * Key: 行或列序号 ([FLOW_ORIENTATION_VERTICAL]: 行(从零开始)  [FLOW_ORIENTATION_HORIZONTAL]: 列(从零开始))
@@ -49,14 +53,21 @@ class FlowLayout @JvmOverloads constructor(
         context.obtainStyledAttributes(attrs, R.styleable.FlowLayout).run {
             mOrientation = getInt(R.styleable.FlowLayout_flowOrientation, FLOW_ORIENTATION_VERTICAL)
             mGravity = getInt(R.styleable.FlowLayout_flowGravity, FLOW_GRAVITY_CENTER)
+            mRawSpace = getDimensionPixelSize(R.styleable.FlowLayout_flowRawSpace, 0)
+            mColumnSpace = getDimensionPixelSize(R.styleable.FlowLayout_flowColumnSpace, 0)
             //一定要回收，否则会内存泄漏
             recycle()
         }
     }
 
+    /**
+     * 测量自身大小
+     */
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         val orientation = mOrientation
+        val rawSpace = mRawSpace
+        val columnSpace = mColumnSpace
 
         val measureWidth = MeasureSpec.getSize(widthMeasureSpec)
         val measureHeight = MeasureSpec.getSize(heightMeasureSpec)
@@ -73,6 +84,8 @@ class FlowLayout @JvmOverloads constructor(
         val childCount = childCount
         // 当前行 或 当前列
         var curRank = 0
+        // 当前行是不是第一行 或 当前列是不是第一列
+        var firstRawOrColumn = true
 
         mRankSparseArray.clear()
         mRankMaxSizeSparseArray.clear()
@@ -94,48 +107,90 @@ class FlowLayout @JvmOverloads constructor(
             when (orientation) {
                 // 行列方向: 逐行排列, 可上下滚动
                 FLOW_ORIENTATION_VERTICAL -> {
-                    if (lineWidth + childWidthWithMargin > realWidth) {
+                    if (index > 0 && lineWidth + childWidthWithMargin + columnSpace > realWidth) {
                         // 需要换行
+                        // 处理上一行
                         width = max(lineWidth, width)
-                        height += lineHeight
+                        height += if (firstRawOrColumn) {
+                            firstRawOrColumn = false
+                            lineHeight
+                        } else {
+                            lineHeight + rawSpace
+                        }
                         mRankMaxSizeSparseArray.put(curRank, lineHeight)
+                        // 处理换行后的当前行
                         mRankSparseArray.put(++curRank, 1)
-                        lineWidth = childWidthWithMargin
+                        // 如果当前Child是最后一个则不加列间隔
+                        lineWidth = if (index == childCount - 1) {
+                            childWidthWithMargin
+                        } else {
+                            childWidthWithMargin + columnSpace
+                        }
                         lineHeight = childHeightWithMargin
                     } else {
                         // 不需要换行
-                        lineHeight = max(lineHeight, childHeightWithMargin)
-                        lineWidth += childWidthWithMargin
                         mRankSparseArray.put(curRank, mRankSparseArray[curRank] + 1)
+                        // 如果当前Child是最后一个则不加列间隔
+                        lineWidth += if (index == childCount - 1) {
+                            childWidthWithMargin
+                        } else {
+                            childWidthWithMargin + columnSpace
+                        }
+                        lineHeight = max(childHeightWithMargin, lineHeight)
                     }
-                    // 最后一行单独处理
+                    // 最后一个单独处理 (用于处理当前行)
                     if (index == childCount - 1) {
-                        width = max(lineWidth, width)
-                        height += lineHeight
                         mRankMaxSizeSparseArray.put(curRank, lineHeight)
+                        width = max(lineWidth, width)
+                        height += if (firstRawOrColumn) {
+                            lineHeight
+                        } else {
+                            lineHeight + rawSpace
+                        }
                     }
                 }
                 // 行列方向: 逐列行列, 可左右滚动
                 FLOW_ORIENTATION_HORIZONTAL -> {
-                    if (lineHeight + childHeightWithMargin > realHeight) {
+                    if (index > 0 && lineHeight + childHeightWithMargin + rawSpace > realHeight) {
                         // 需要换列
-                        width += lineWidth
+                        // 处理上一列
+                        width += if (firstRawOrColumn) {
+                            firstRawOrColumn = false
+                            lineWidth
+                        } else {
+                            lineWidth + rawSpace
+                        }
                         height = max(lineHeight, height)
                         mRankMaxSizeSparseArray.put(curRank, lineWidth)
+                        // 处理换列后的当前列
                         mRankSparseArray.put(++curRank, 1)
                         lineWidth = childWidthWithMargin
-                        lineHeight = childHeightWithMargin
+                        // 如果当前Child是最后一个则不加行间隔
+                        lineHeight = if (index == childCount - 1) {
+                            childHeightWithMargin
+                        } else {
+                            childHeightWithMargin + rawSpace
+                        }
                     } else {
                         // 不需要换列
-                        lineHeight += childHeightWithMargin
-                        lineWidth = max(lineWidth, childWidthWithMargin)
                         mRankSparseArray.put(curRank, mRankSparseArray[curRank] + 1)
+                        lineWidth = max(childWidthWithMargin, lineWidth)
+                        // 如果当前Child是最后一个则不加行间隔
+                        lineHeight += if (index == childCount - 1) {
+                            childHeightWithMargin
+                        } else {
+                            childHeightWithMargin + rawSpace
+                        }
                     }
                     // 最后一列单独处理
                     if (index == childCount - 1) {
-                        width += lineWidth
-                        height = max(lineHeight, height)
                         mRankMaxSizeSparseArray.put(curRank, lineWidth)
+                        width += if (firstRawOrColumn) {
+                            lineWidth
+                        } else {
+                            lineWidth + rawSpace
+                        }
+                        height = max(lineHeight, height)
                     }
                 }
                 else -> {}
@@ -143,16 +198,18 @@ class FlowLayout @JvmOverloads constructor(
         }
 
         when (orientation) {
+            // 行列方向: 逐行排列, 可上下滚动
             FLOW_ORIENTATION_VERTICAL -> {
                 if (measureWidthMode == MeasureSpec.AT_MOST) {
-                    width += paddingStart + paddingEnd
+                    width += (paddingStart + paddingEnd)
                 }
-                height += paddingTop + paddingBottom
+                height += (paddingTop + paddingBottom)
             }
+            // 行列方向: 逐列行列, 可左右滚动
             FLOW_ORIENTATION_HORIZONTAL -> {
-                width += paddingStart + paddingEnd
+                width += (paddingStart + paddingEnd)
                 if (measureHeightMode == MeasureSpec.AT_MOST) {
-                    height += paddingTop + paddingBottom
+                    height += (paddingTop + paddingBottom)
                 }
             }
         }
@@ -162,9 +219,14 @@ class FlowLayout @JvmOverloads constructor(
         )
     }
 
+    /**
+     * 对 Child View 进行布局
+     */
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
         val orientation = mOrientation
         val gravity = mGravity
+        val rawSpace = mRawSpace
+        val columnSpace = mColumnSpace
 
         var lineWidth = 0
         var lineHeight = 0
@@ -209,15 +271,25 @@ class FlowLayout @JvmOverloads constructor(
             when (orientation) {
                 // 行列方向: 逐行排列, 可上下滚动
                 FLOW_ORIENTATION_VERTICAL -> {
-                    if (childWidthWithMargin + lineWidth > width) {
+                    if (lineWidth + childWidthWithMargin + columnSpace > width) {
                         // 换行了
-                        top += lineHeight
+                        top += (lineHeight + rawSpace)
                         left = paddingStart
-                        lineWidth = childWidthWithMargin
+                        // 如果当前Child是最后一个则不加列间隔
+                        lineWidth = if (index == childCount - 1) {
+                            childWidthWithMargin
+                        } else {
+                            childWidthWithMargin + columnSpace
+                        }
                         lineHeight = childHeightWithMargin
                     } else {
                         // 没有换行
-                        lineWidth += childWidthWithMargin
+                        // 如果当前Child是最后一个则不加列间隔
+                        lineWidth += if (index == childCount - 1) {
+                            childWidthWithMargin
+                        } else {
+                            childWidthWithMargin + columnSpace
+                        }
                         lineHeight = max(lineHeight, childHeightWithMargin)
                     }
 
@@ -235,20 +307,35 @@ class FlowLayout @JvmOverloads constructor(
                     }
                     realBottom = realTop + childHeight
 
-                    left += childWidthWithMargin
+                    // 如果当前Child是最后一个则不加列间隔
+                    left += if (index == childCount - 1) {
+                        childWidthWithMargin
+                    } else {
+                        childWidthWithMargin + columnSpace
+                    }
                 }
                 // 行列方向: 逐列行列, 可左右滚动
                 FLOW_ORIENTATION_HORIZONTAL -> {
-                    if (childHeightWithMargin + lineHeight > height) {
+                    if (lineHeight + childHeightWithMargin + rawSpace > height) {
                         // 换列了
                         top = paddingTop
-                        left += lineWidth
+                        left += (lineWidth + columnSpace)
                         lineWidth = childWidthWithMargin
-                        lineHeight = childHeightWithMargin
+                        // 如果当前Child是最后一个则不加行间隔
+                        lineHeight = if (index == childCount - 1) {
+                            childHeightWithMargin
+                        } else {
+                            childHeightWithMargin + rawSpace
+                        }
                     } else {
                         // 没有换列
                         lineWidth = max(lineWidth, childWidthWithMargin)
-                        lineHeight += childHeightWithMargin
+                        // 如果当前Child是最后一个则不加行间隔
+                        lineHeight += if (index == childCount - 1) {
+                            childHeightWithMargin
+                        } else {
+                            childHeightWithMargin + rawSpace
+                        }
                     }
 
                     realLeft = when (gravity) {
@@ -265,7 +352,11 @@ class FlowLayout @JvmOverloads constructor(
                     realTop = top + marginTop
                     realBottom = realTop + childHeight
 
-                    top += childHeightWithMargin
+                    top += if (index == childCount - 1) {
+                        childHeightWithMargin
+                    } else {
+                        childHeightWithMargin + rawSpace
+                    }
                 }
                 else -> {
                     realLeft = 0

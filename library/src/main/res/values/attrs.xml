@@ -137,6 +137,10 @@
             <!-- Child所处的位置: 右部  用于{@link FlowOrientation#HORIZONTAL} -->
             <enum name="right" value="4" />
         </attr>
+        <!-- 行间隔 (注: 会和 topMargin, bottomMargin 叠加) -->
+        <attr name="flowRawSpace" format="dimension|reference" />
+        <!-- 列间隔 (注: 会和 leftMargin(getMarginStart()), rightMargin(getMarginEnd()) 叠加) -->
+        <attr name="flowColumnSpace" format="dimension|reference" />
     </declare-styleable>
 
     <!-- 气泡背景 -->
