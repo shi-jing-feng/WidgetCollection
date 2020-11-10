@@ -8,6 +8,8 @@
     <attr name="bgColor" format="color|reference" />
     <!-- 圆角半径 -->
     <attr name="cornerRadius" format="dimension|reference" />
+    <!-- 颜色 -->
+    <attr name="color" format="color|reference" />
 
     <!-- 进度环 -->
     <declare-styleable name="ProgressRing">
@@ -101,7 +103,7 @@
     <!-- IsoscelesTriangleView -->
     <declare-styleable name="IsoscelesTriangleView">
         <!-- 颜色 -->
-        <attr name="color" format="color|reference" />
+        <attr name="color" />
         <!-- 样式 -->
         <attr name="isosceles_triangle_style" format="enum">
             <!-- 以两腰之间的尖端开始，从顶部到底部 (垂直方向正三角形) -->
@@ -177,6 +179,14 @@
         <attr name="shadowDy" format="dimension|reference" />
         <!-- 阴影颜色 -->
         <attr name="shadowColor" format="color|reference" />
+    </declare-styleable>
+    
+    <!-- 粒子扩散效果 View (仿网易云空灵轻音特效) -->
+    <declare-styleable name="ParticleDiffuseView">
+        <!-- 半径 -->
+        <attr name="radius" format="dimension|reference" />
+        <!-- 颜色 -->
+        <attr name="color" />
     </declare-styleable>
 
 </resources>

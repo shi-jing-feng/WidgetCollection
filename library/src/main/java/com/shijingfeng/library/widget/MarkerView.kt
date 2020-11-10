@@ -21,7 +21,7 @@ import kotlin.math.pow
 import kotlin.math.sqrt
 
 /**
- * Function:
+ * Function: 三角标记 View
  * Date: 2020/8/13 17:54
  * Description:
  * @author ShiJingFeng
