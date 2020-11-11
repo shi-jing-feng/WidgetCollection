@@ -20,7 +20,7 @@ private val MAIN_HANDLER = Handler(Looper.getMainLooper())
 /**
  * 获取 主线程 Handler
  */
-val mainHandler: Handler
+internal val mainHandler: Handler
     get() = MAIN_HANDLER
 
 /**
@@ -28,8 +28,7 @@ val mainHandler: Handler
  *
  * @return true: 主线程  false: 非主线程
  */
-val isMainThread: Boolean
-    @AnyThread get() = Looper.myLooper() == Looper.getMainLooper()
+internal val isMainThread: Boolean @AnyThread get() = Looper.myLooper() == Looper.getMainLooper()
 
 /**
  * 运行在主线程

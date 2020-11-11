@@ -5,15 +5,13 @@ import android.animation.ValueAnimator.INFINITE
 import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
-import android.util.Log
-import android.util.Log.e
 import android.view.View
 import android.view.animation.LinearInterpolator
 import androidx.annotation.ColorInt
 import com.shijingfeng.library.R
+import com.shijingfeng.library.util.coordinateToRadian
 import com.shijingfeng.library.util.dp2px
 import java.util.*
-import kotlin.math.acos
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -23,7 +21,13 @@ private const val DEFAULT_PARTICLE_COLOR = Color.WHITE
 /** 粒子数量 */
 private const val PARTICLE_NUMBER = 2000
 /** 粒子半径 */
-private val PARTICLE_RADIUS = dp2px(1F).toFloat()
+private val PARTICLE_RADIUS = dp2px(0.5F).toFloat()
+/** 粒子最慢速度 */
+private val PARTICLE_SLOWEST_SPEED by lazy {
+    val speedPx = dp2px(0.5F)
+
+    if (speedPx >= 1) speedPx else 1
+}
 
 /** 动画持续时间(毫秒值) 默认: 2000毫秒 */
 private const val ANIMATOR_DURATION_MS = 2000L
@@ -54,9 +58,6 @@ class ParticleDiffuseView @JvmOverloads constructor(
     /** 用于测量粒子所在路径的位置 */
     private val mPathMeasure = PathMeasure()
 
-    /** 粒子动画 */
-    private val mAnimator = ValueAnimator.ofFloat(0F, 1F)
-
     /** Random */
     private val mRandom = Random()
 
@@ -65,6 +66,12 @@ class ParticleDiffuseView @JvmOverloads constructor(
     private var mParticleColor = DEFAULT_PARTICLE_COLOR
     /** 粒子列表 */
     private val mParticleList = mutableListOf<Particle>()
+    /** 粒子更新的次数 */
+    private var mParticleUpdatedCount = 0
+    /** 粒子要绘制的话需要更新的最小次数 (延迟刷新, 用于解决动画开始时的粒子向外扩散不美观的问题) */
+    private var mParticleStartUpdateCount = 0
+    /** 粒子动画 */
+    private val mAnimator = ValueAnimator.ofFloat(0F, 1F)
 
     /** 扩散圆(内圆) 半径 */
     private var mInnerCircleRadius = 0F
@@ -97,8 +104,10 @@ class ParticleDiffuseView @JvmOverloads constructor(
             repeatCount = INFINITE
             interpolator = LinearInterpolator()
             addUpdateListener {
+                // 注意: 粒子速度和动画duration没有关系, 和 Particle.speed 大小有关系
                 updateParticle()
                 invalidate()
+                ++mParticleUpdatedCount
             }
         }
     }
@@ -116,43 +125,34 @@ class ParticleDiffuseView @JvmOverloads constructor(
             mPathMeasure.getPosTan(i / PARTICLE_NUMBER.toFloat() * mPathMeasure.length, mInnerCirclePos, mInnerCircleTan)
 
             val center = mSize / 2F
-            val x = mInnerCirclePos[0] - center
-            val y = mInnerCirclePos[1] - center
-            // 在扩展圆(内圆) 边界线 X轴方向 左右浮动
-            val randomX = mRandom.nextInt(dp2px(6F)) - dp2px(3F)
-            // 在扩展圆(内圆) 边界线 Y轴方向 上下浮动
-            val randomY = mRandom.nextInt(dp2px(6F)) - dp2px(3F)
+            val x = mInnerCirclePos[0]
+            val y = mInnerCirclePos[1]
             // 速度 (以动画每次刷新作为单位时间)
-            val speed = mRandom.nextInt(dp2px(2F)) + dp2px(0.5F)
-            // 弧度值
-            val angle = if (x >= 0F && y >= 0F) {
-                // 第一象限
-                Math.toRadians(270.0) + acos(if (y > mInnerCircleRadius) 1.0 else (y / mInnerCircleRadius).toDouble())
-            } else if (x <= 0F && y >= 0F) {
-                // 第二象限
-                Math.toRadians(180.0) + acos(if (-x > mInnerCircleRadius) 1.0 else (-x / mInnerCircleRadius).toDouble())
-            } else if (x <= 0F && y <= 0F) {
-                // 第三象限
-                Math.toRadians(90.0) + acos(if (-y > mInnerCircleRadius) 1.0 else (-y / mInnerCircleRadius).toDouble())
-            } else {
-                // 第四象限
-                acos(if (x > mInnerCircleRadius) 1.0 else (x / mInnerCircleRadius).toDouble())
-            }
-            e("测试", "angle: ${Math.toDegrees(angle)}")
+            val speed = getRandomSpeed()
+            // 弧度值  弧度方向: 以X轴(正轴)为起点, 顺时针为角度增加方向
+            val angle = coordinateToRadian(
+                x = x - center,
+                y = y - center
+            )
             // 当前移动距离
             val offset = 0F
             // 最大移动距离
             val maxOffset = mRandom.nextInt(mRingThickness.toInt())
 
             mParticleList.add(Particle(
-                x = x + randomX,
-                y = y + randomY,
-                speed = speed.toFloat(),
+                // 在扩展圆(内圆) 边界线 X轴方向 左右浮动
+                x = x + getCoordinateRandomOffset(),
+                // 在扩展圆(内圆) 边界线 Y轴方向 上下浮动
+                y = y + getCoordinateRandomOffset(),
+                speed = speed,
                 angle = angle,
                 offset = offset,
                 maxOffset = maxOffset.toFloat()
             ))
         }
+        mParticleUpdatedCount = 0
+        mParticleStartUpdateCount = (mRingThickness / PARTICLE_SLOWEST_SPEED).toInt()
+        mAnimator.cancel()
         mAnimator.start()
     }
 
@@ -166,15 +166,15 @@ class ParticleDiffuseView @JvmOverloads constructor(
                 // 当前移动距离
                 particle.offset = 0F
                 // 速度 (以动画每次刷新作为单位时间)
-                particle.speed = mRandom.nextInt(dp2px(2F)) + dp2px(0.5F).toFloat()
+                particle.speed = getRandomSpeed()
                 // 最大移动距离
                 particle.maxOffset = mRandom.nextInt(mRingThickness.toInt()).toFloat()
                 // 计算路径
                 mPathMeasure.getPosTan(mRandom.nextInt(mPathMeasure.length.toInt() + 1).toFloat(), mInnerCirclePos, mInnerCircleTan)
                 // X轴初始位置
-                particle.x = mInnerCirclePos[0] + mRandom.nextInt(dp2px(6F)) - dp2px(3F)
+                particle.x = mInnerCirclePos[0] + getCoordinateRandomOffset()
                 // Y轴初始位置
-                particle.y = mInnerCirclePos[1] + mRandom.nextInt(dp2px(6F)) - dp2px(3F)
+                particle.y = mInnerCirclePos[1] + getCoordinateRandomOffset()
             } else {
                 // 当前移动距离
                 particle.offset += particle.speed
@@ -190,11 +190,33 @@ class ParticleDiffuseView @JvmOverloads constructor(
      * 绘制粒子
      */
     private fun drawParticle(canvas: Canvas?) {
-        mParticleList.forEach { particle ->
-            mPaint.alpha = ((1F - particle.offset / particle.maxOffset) * 255F).toInt()
+        // 延迟刷新, 用于解决动画开始时的粒子向外扩散不美观的问题
+        if (mParticleUpdatedCount >= mParticleStartUpdateCount) {
+            mParticleList.forEach { particle ->
+                val alphaFloat = 1F - particle.offset / particle.maxOffset
+                val alpha = (alphaFloat * 255F).toInt()
 
-            canvas?.drawCircle(particle.x, particle.y, PARTICLE_RADIUS, mPaint)
+                // 加界限判断, 防止闪烁
+                mPaint.alpha = when {
+                    alpha < 0 -> 0
+                    alpha > 255 -> 255
+                    else -> alpha
+                }
+                canvas?.drawCircle(particle.x, particle.y, PARTICLE_RADIUS, mPaint)
+            }
         }
+    }
+
+    /**
+     * 获取坐标随机偏移量
+     */
+    private fun getCoordinateRandomOffset() = mRandom.nextInt(dp2px(6F)) - dp2px(3F).toFloat()
+
+    /**
+     * 获取随机速度量
+     */
+    private fun getRandomSpeed(): Float {
+        return mRandom.nextInt(PARTICLE_SLOWEST_SPEED) + PARTICLE_SLOWEST_SPEED.toFloat()
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
@@ -242,7 +264,7 @@ private data class Particle(
     /** 粒子速度 */
     var speed: Float,
 
-    /** 粒子发散的角度 */
+    /** 粒子发散的角度(弧度值) 弧度方向: 以X轴(正轴)为起点, 顺时针为角度增加方向 */
     var angle: Double,
 
     /** 当前移动距离 */
