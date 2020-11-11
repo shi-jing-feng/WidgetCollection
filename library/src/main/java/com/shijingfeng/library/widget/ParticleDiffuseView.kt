@@ -5,12 +5,16 @@ import android.animation.ValueAnimator.INFINITE
 import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
+import android.util.Log.e
 import android.view.View
 import android.view.animation.LinearInterpolator
+import androidx.annotation.AnyThread
 import androidx.annotation.ColorInt
 import com.shijingfeng.library.R
+import com.shijingfeng.library.entity.ParticleMultiColor
 import com.shijingfeng.library.util.coordinateToRadian
 import com.shijingfeng.library.util.dp2px
+import com.shijingfeng.library.util.runOnUiThread
 import java.util.*
 import kotlin.math.cos
 import kotlin.math.sin
@@ -64,6 +68,8 @@ class ParticleDiffuseView @JvmOverloads constructor(
     /** 粒子颜色 */
     @ColorInt
     private var mParticleColor = DEFAULT_PARTICLE_COLOR
+    /** 粒子多颜色列表 */
+//    private var mParticleMultiColorList: List<ParticleMultiColor>? = null
     /** 粒子列表 */
     private val mParticleList = mutableListOf<Particle>()
     /** 粒子更新的次数 */
@@ -116,7 +122,9 @@ class ParticleDiffuseView @JvmOverloads constructor(
      * 初始化粒子
      */
     private fun initParticle() {
+        mPaint.color = mParticleColor
         // CW: 顺时针  CCW: 逆时针
+        mPath.reset()
         mPath.addCircle(mSize / 2F, mSize / 2F, mInnerCircleRadius, Path.Direction.CCW)
         mPathMeasure.setPath(mPath, false)
         mParticleList.clear()
@@ -219,9 +227,12 @@ class ParticleDiffuseView @JvmOverloads constructor(
         return mRandom.nextInt(PARTICLE_SLOWEST_SPEED) + PARTICLE_SLOWEST_SPEED.toFloat()
     }
 
-    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
-        super.onSizeChanged(w, h, oldw, oldh)
-        mSize = if (w > h) h.toFloat() else w.toFloat()
+    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
+        super.onLayout(changed, left, top, right, bottom)
+        val width = right - left
+        val height = bottom - top
+
+        mSize = if (width > height) height.toFloat() else width.toFloat()
         // 默认扩展圆(内圆)半径为宽的一半
         if (mInnerCircleRadius.toInt() == 0) {
             mInnerCircleRadius = mSize / 4F
@@ -246,6 +257,41 @@ class ParticleDiffuseView @JvmOverloads constructor(
             removeAllListeners()
             cancel()
         }
+    }
+
+    /**
+     * 扩展圆(内圆) 半径
+     */
+    var radius: Float
+        get() = this.mInnerCircleRadius
+        set(radius) {
+            this.mInnerCircleRadius = radius
+        }
+
+    /**
+     * 粒子颜色
+     */
+    var color: Int
+        @ColorInt get() = this.mParticleColor
+        set(@ColorInt color) {
+            this.mParticleColor = color
+        }
+
+    /**
+     * 颜色列表
+     */
+//    var colorList: List<ParticleMultiColor>?
+//        get() = this.mParticleMultiColorList
+//        set(colorList) {
+//            this.mParticleMultiColorList = colorList
+//        }
+
+    /**
+     * 刷新
+     */
+    @AnyThread
+    fun refresh() = runOnUiThread {
+        requestLayout()
     }
 
 }
