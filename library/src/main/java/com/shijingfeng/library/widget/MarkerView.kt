@@ -66,7 +66,7 @@ class MarkerView @JvmOverloads constructor(
     private var mText = ""
 
     /** 文本大小 px值 */
-    private var mTextSize = -1F
+    private var mTextSize = 0F
     /** 是否自定义文本大小  true:自定义  false:默认 */
     private var mCustomTextSize = false
 
@@ -79,12 +79,12 @@ class MarkerView @JvmOverloads constructor(
     private var mBgColor = Color.RED
 
     /** 圆角半径 px值 (在圆角三角形样式下有效) */
-    private var mCornerRadius = -1F
+    private var mCornerRadius = 0F
     /** 是否自定义圆角半径  true:自定义  false:默认 */
     private var mCustomCornerRadius = false
 
     /** 缺失的三角形(整体的三角形缩小版)的腰长 px值(等腰三角形) (在缺失三角形样式下有效) */
-    private var mMissingTriangleWaistLength = -1F
+    private var mMissingTriangleWaistLength = 0F
     /** 是否自定义缺失的三角形的腰长  true:自定义  false:默认 */
     private var mCustomMissingTriangleWaistLength = false
 

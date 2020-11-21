@@ -9,7 +9,6 @@ import android.view.View
 import android.view.animation.LinearInterpolator
 import androidx.annotation.AnyThread
 import androidx.annotation.ColorInt
-import androidx.core.content.res.getDimensionOrThrow
 import com.shijingfeng.library.R
 import com.shijingfeng.library.util.coordinateToRadian
 import com.shijingfeng.library.util.runOnUiThread
@@ -20,17 +19,15 @@ import kotlin.math.sin
 /** 默认粒子颜色 白色 */
 private const val DEFAULT_PARTICLE_COLOR = Color.WHITE
 
+/** 比例基准值 */
+private const val SCALE_BASE_VALUE = 1F / 1000F
 /** 默认粒子半径大小比例值 */
-private const val DEFAULT_PARTICLE_RADIUS_SCALE_VALUE = 1F / 600F
+private const val DEFAULT_PARTICLE_RADIUS_SCALE_VALUE = 1.7F * SCALE_BASE_VALUE
+/** 粒子最慢速度大小比例值 */
+private const val DEFAULT_PARTICLE_SLOWEST_SPEED_SCALE_VALUE = 1.5F * SCALE_BASE_VALUE
 
 /** 粒子数量 */
 private const val PARTICLE_NUMBER = 2000
-/** 粒子最慢速度 */
-private val PARTICLE_SLOWEST_SPEED by lazy {
-    val speedPx = dp2px(0.5F)
-
-    if (speedPx >= 1) speedPx else 1
-}
 
 /** 动画持续时间(毫秒值) 默认: 2000毫秒 */
 private const val ANIMATOR_DURATION_MS = 2000L
@@ -68,7 +65,9 @@ class ParticleDiffuseView @JvmOverloads constructor(
     @ColorInt
     private var mParticleColor = DEFAULT_PARTICLE_COLOR
     /** 粒子半径 */
-    private var mParticleRadius = -1F
+    private var mParticleRadius = 0F
+    /** 粒子最慢速度 */
+    private var mParticleSlowestSpeed = 0F
     /** 粒子多颜色列表 */
 //    private var mParticleMultiColorList: List<ParticleMultiColor>? = null
     /** 粒子列表 */
@@ -160,7 +159,7 @@ class ParticleDiffuseView @JvmOverloads constructor(
             ))
         }
         mParticleUpdatedCount = 0
-        mParticleStartUpdateCount = (mRingThickness / PARTICLE_SLOWEST_SPEED).toInt()
+        mParticleStartUpdateCount = (mRingThickness / mParticleSlowestSpeed).toInt()
         mAnimator.cancel()
         mAnimator.start()
     }
@@ -219,13 +218,13 @@ class ParticleDiffuseView @JvmOverloads constructor(
     /**
      * 获取坐标随机偏移量
      */
-    private fun getCoordinateRandomOffset() = mRandom.nextInt(dp2px(6F)) - dp2px(3F).toFloat()
+    private fun getCoordinateRandomOffset() = mRandom.nextInt((19.2F * SCALE_BASE_VALUE * mSize).toInt()) - 9.6F * SCALE_BASE_VALUE * mSize
 
     /**
      * 获取随机速度量
      */
     private fun getRandomSpeed(): Float {
-        return mRandom.nextInt(PARTICLE_SLOWEST_SPEED) + PARTICLE_SLOWEST_SPEED.toFloat()
+        return mRandom.nextInt(mParticleSlowestSpeed.toInt()) + mParticleSlowestSpeed
     }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
@@ -239,9 +238,8 @@ class ParticleDiffuseView @JvmOverloads constructor(
             mInnerCircleRadius = mSize / 4F
         }
         mRingThickness = mSize / 2 - mInnerCircleRadius
-        if (mParticleRadius <= 0F) {
-            mParticleRadius = DEFAULT_PARTICLE_RADIUS_SCALE_VALUE * mSize
-        }
+        mParticleRadius = DEFAULT_PARTICLE_RADIUS_SCALE_VALUE * mSize
+        mParticleSlowestSpeed = DEFAULT_PARTICLE_SLOWEST_SPEED_SCALE_VALUE * mSize
         initParticle()
     }
 
