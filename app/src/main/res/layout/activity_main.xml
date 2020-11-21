@@ -36,12 +36,13 @@
                 app:totalProgress="100" />
 
             <com.shijingfeng.library.widget.MarkerView
+                android:id="@+id/marker_view"
                 android:layout_width="65dp"
                 android:layout_height="65dp"
                 android:layout_marginEnd="15dp"
                 app:bgColor="@color/colorPrimaryDark"
-                app:text="重要"
-                app:textSize="15sp" />
+                app:marker_view_style="cornerTriangle"
+                app:text="重要" />
 
             <com.shijingfeng.library.widget.IsoscelesTriangleView
                 android:layout_width="65dp"
@@ -92,10 +93,10 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
             android:background="#FF0000"
+            app:flowColumnSpace="10dp"
             app:flowGravity="center"
             app:flowOrientation="vertical"
-            app:flowRawSpace="10dp"
-            app:flowColumnSpace="10dp">
+            app:flowRawSpace="10dp">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -107,8 +108,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="#00FF00"
                 android:layout_margin="10dp"
+                android:background="#00FF00"
                 android:padding="20dp"
                 android:text="霎哈嘎哈啥还是" />
 
@@ -219,7 +220,7 @@
 
             <TextView
                 android:layout_width="100dp"
-                android:layout_height="wrap_content"
+                android:layout_height="200dp"
                 android:layout_gravity="start|top"
                 android:text="澳四国hi熬过哈杀三个和水果和sgaga是个好尬拉回嘎嘎hi i阿拉贡和后果哈身高韩国欧安会搞好"
                 android:textColor="#000000" />
@@ -245,8 +246,8 @@
             android:layout_height="350dp"
             android:layout_marginTop="15dp"
             android:background="#000000"
-            app:radius="50dp"
-            app:color="#FF0000"/>
+            app:color="#FF0000"
+            app:radius="50dp" />
 
     </LinearLayout>
 

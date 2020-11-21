@@ -5,15 +5,13 @@ import android.animation.ValueAnimator.INFINITE
 import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
-import android.util.Log.e
 import android.view.View
 import android.view.animation.LinearInterpolator
 import androidx.annotation.AnyThread
 import androidx.annotation.ColorInt
+import androidx.core.content.res.getDimensionOrThrow
 import com.shijingfeng.library.R
-import com.shijingfeng.library.entity.ParticleMultiColor
 import com.shijingfeng.library.util.coordinateToRadian
-import com.shijingfeng.library.util.dp2px
 import com.shijingfeng.library.util.runOnUiThread
 import java.util.*
 import kotlin.math.cos
@@ -22,10 +20,11 @@ import kotlin.math.sin
 /** 默认粒子颜色 白色 */
 private const val DEFAULT_PARTICLE_COLOR = Color.WHITE
 
+/** 默认粒子半径大小比例值 */
+private const val DEFAULT_PARTICLE_RADIUS_SCALE_VALUE = 1F / 600F
+
 /** 粒子数量 */
 private const val PARTICLE_NUMBER = 2000
-/** 粒子半径 */
-private val PARTICLE_RADIUS = dp2px(0.5F).toFloat()
 /** 粒子最慢速度 */
 private val PARTICLE_SLOWEST_SPEED by lazy {
     val speedPx = dp2px(0.5F)
@@ -68,6 +67,8 @@ class ParticleDiffuseView @JvmOverloads constructor(
     /** 粒子颜色 */
     @ColorInt
     private var mParticleColor = DEFAULT_PARTICLE_COLOR
+    /** 粒子半径 */
+    private var mParticleRadius = -1F
     /** 粒子多颜色列表 */
 //    private var mParticleMultiColorList: List<ParticleMultiColor>? = null
     /** 粒子列表 */
@@ -210,7 +211,7 @@ class ParticleDiffuseView @JvmOverloads constructor(
                     alpha > 255 -> 255
                     else -> alpha
                 }
-                canvas?.drawCircle(particle.x, particle.y, PARTICLE_RADIUS, mPaint)
+                canvas?.drawCircle(particle.x, particle.y, mParticleRadius, mPaint)
             }
         }
     }
@@ -238,6 +239,9 @@ class ParticleDiffuseView @JvmOverloads constructor(
             mInnerCircleRadius = mSize / 4F
         }
         mRingThickness = mSize / 2 - mInnerCircleRadius
+        if (mParticleRadius <= 0F) {
+            mParticleRadius = DEFAULT_PARTICLE_RADIUS_SCALE_VALUE * mSize
+        }
         initParticle()
     }
 

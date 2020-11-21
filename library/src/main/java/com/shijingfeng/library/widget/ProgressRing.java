@@ -22,6 +22,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import static android.util.Log.e;
+
 /**
  * Function:
  * Date: 2020/8/18 17:53

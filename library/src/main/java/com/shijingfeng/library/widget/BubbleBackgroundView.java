@@ -27,6 +27,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import static android.util.Log.e;
 import static com.shijingfeng.library.util.SizeUtil.dp2px;
 import static com.shijingfeng.library.widget.BubbleBackgroundView.Direction.BOTTOM;
 import static com.shijingfeng.library.widget.BubbleBackgroundView.Direction.LEFT;
@@ -42,26 +43,35 @@ import static com.shijingfeng.library.widget.BubbleBackgroundView.Direction.TOP;
  */
 public class BubbleBackgroundView extends FrameLayout {
 
+    /** 默认箭头宽比例值 */
+    private static final float DEFAULT_ARROW_WIDTH = 2F / 9F;
+    /** 默认箭头高比例值 */
+    private static final float DEFAULT_ARROW_HEIGHT = 2F / 9F;
+    /** 默认圆角半径比例值 */
+    private static final float DEFAULT_CORNER_RADIUS = 1F / 18F;
+    /** 默认阴影半径比例值 */
+    private static final float DEFAULT_SHADOW_RADIUS = 7F / 90F;
+
     private Paint mSpacePaint;
     private Path mPath;
 
     /** 箭头宽 */
-    private float mArrowWidth = dp2px(30F);
+    private float mArrowWidth = -1F;
     /** 箭头高 */
-    private float mArrowHeight = dp2px(30F);
+    private float mArrowHeight = -1F;
     /** 箭头方向 */
     private @Direction int mArrowDirection = TOP;
     /** 从背景空间坐标轴原点 (除去阴影距离和边框距离的坐标原点) 到 箭头中心点 的距离 (可能是水平距离，也可能是垂直距离，取决于箭头位置) */
     private float mArrowDistanceFromOrigin = -1F;
     /** 圆角半径 */
-    private float mCornerRadius = dp2px(5F);
+    private float mCornerRadius = -1F;
     /** 背景颜色 */
     private int mBgColor = Color.WHITE;
 
     /** 是否显示阴影  true: 显示  false: 不显示 */
     private boolean mShowShadow = false;
     /** 阴影半径 */
-    private @FloatRange(from = 0F, to = Float.MAX_VALUE) float mShadowRadius = dp2px(5F);
+    private float mShadowRadius = -1F;
     /** 阴影水平偏移量 (正值向右偏移，负值向左偏移) */
     private float mShadowDx = 0F;
     /** 阴影垂直偏移量 (正值向下偏移，负值向上偏移) */
@@ -97,15 +107,15 @@ public class BubbleBackgroundView extends FrameLayout {
 
         final TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.BubbleBackgroundView);
 
-        mArrowWidth = typedArray.getDimension(R.styleable.BubbleBackgroundView_arrowWidth, dp2px(30F));
-        mArrowHeight = typedArray.getDimension(R.styleable.BubbleBackgroundView_arrowHeight, dp2px(30F));
+        mArrowWidth = typedArray.getDimension(R.styleable.BubbleBackgroundView_arrowWidth, -1F);
+        mArrowHeight = typedArray.getDimension(R.styleable.BubbleBackgroundView_arrowHeight, -1F);
         mArrowDirection = typedArray.getInt(R.styleable.BubbleBackgroundView_arrowDirection, TOP);
         mArrowDistanceFromOrigin = typedArray.getDimension(R.styleable.BubbleBackgroundView_arrowDistanceFromOrigin, -1F);
-        mCornerRadius = typedArray.getDimension(R.styleable.BubbleBackgroundView_cornerRadius, dp2px(5F));
+        mCornerRadius = typedArray.getDimension(R.styleable.BubbleBackgroundView_cornerRadius, -1F);
         mBgColor = typedArray.getColor(R.styleable.BubbleBackgroundView_bgColor, Color.WHITE);
 
         mShowShadow = typedArray.getBoolean(R.styleable.BubbleBackgroundView_showShadow, false);
-        mShadowRadius = typedArray.getDimension(R.styleable.BubbleBackgroundView_shadowRadius, dp2px(5F));
+        mShadowRadius = typedArray.getDimension(R.styleable.BubbleBackgroundView_shadowRadius, -1F);
         mShadowDx = typedArray.getDimension(R.styleable.BubbleBackgroundView_shadowDx, 0F);
         mShadowDy = typedArray.getDimension(R.styleable.BubbleBackgroundView_shadowDy, 0F);
         mShadowColor = typedArray.getColor(R.styleable.BubbleBackgroundView_shadowColor, Color.parseColor("#EEEEEE"));
@@ -150,12 +160,17 @@ public class BubbleBackgroundView extends FrameLayout {
         width += paddingStart + paddingEnd;
         height += paddingTop + paddingBottom;
 
+        if (mCornerRadius < 0F) {
+            mCornerRadius = DEFAULT_CORNER_RADIUS * Math.min(width, height);
+        }
+        if (mShadowRadius < 0F) {
+            mShadowRadius = DEFAULT_SHADOW_RADIUS * Math.max(width, height);
+        }
+
         // 阴影半径
         final int shadowRadius = (int) mShadowRadius;
         // 箭头方向
         final @Direction int arrowDirection = mArrowDirection;
-        // 箭头高度
-        final int arrowHeight = (int) mArrowHeight;
 
         if (mShowShadow) {
             width += shadowRadius;
@@ -166,13 +181,25 @@ public class BubbleBackgroundView extends FrameLayout {
             case TOP:
             // 底部
             case BOTTOM:
-                height += arrowHeight;
+                if (mArrowWidth < 0F) {
+                    mArrowWidth = DEFAULT_ARROW_WIDTH * width;
+                }
+                if (mArrowHeight < 0F) {
+                    mArrowHeight = DEFAULT_ARROW_HEIGHT * width;
+                }
+                height += mArrowHeight;
                 break;
             // 左部
             case LEFT:
             // 右部
             case RIGHT:
-                width += arrowHeight;
+                if (mArrowWidth < 0F) {
+                    mArrowWidth = DEFAULT_ARROW_WIDTH * height;
+                }
+                if (mArrowHeight < 0F) {
+                    mArrowHeight = DEFAULT_ARROW_HEIGHT * height;
+                }
+                width += mArrowHeight;
                 break;
             default:
                 break;

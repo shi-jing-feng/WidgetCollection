@@ -6,9 +6,11 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Path
 import android.util.AttributeSet
+import android.util.Log.e
 import android.view.View
 import androidx.annotation.AnyThread
 import androidx.annotation.ColorInt
+import androidx.core.content.res.getDimensionOrThrow
 import com.shijingfeng.library.R
 import com.shijingfeng.library.annotation.define.MarkerViewPosition
 import com.shijingfeng.library.annotation.define.MarkerViewPosition.*
@@ -19,6 +21,13 @@ import com.shijingfeng.library.util.runOnUiThread
 import com.shijingfeng.library.util.sp2px
 import kotlin.math.pow
 import kotlin.math.sqrt
+
+/** 默认文本大小比例值 */
+private const val DEFAULT_TEXT_SIZE_SCALE_VALUE = 42F / 179F
+/** 默认圆角大小比例值 */
+private const val DEFAULT_CORNER_RADIUS_SCALE_VALUE = 27F / 179F
+/** 默认缺失的三角形(整体的三角形缩小版)的腰长(等腰三角形)大小比例值 */
+private const val DEFAULT_MISSING_TRIANGLE_WAIST_LENGTH_SCALE_VALUE = 27F / 179F
 
 /**
  * Function: 三角标记 View
@@ -43,19 +52,23 @@ class MarkerView @JvmOverloads constructor(
         isAntiAlias = true
     }
 
-    private val mLinePath = Path()
-    private val mLinePaint = Paint().apply {
-        isAntiAlias = true
-        color = Color.WHITE
-        style = Paint.Style.STROKE
-        strokeWidth = dp2px(1F).toFloat()
-    }
+    /** 辅助线 (测试用) */
+//    private val mLinePath = Path()
+//    private val mLinePaint = Paint().apply {
+//        isAntiAlias = true
+//        color = Color.WHITE
+//        style = Paint.Style.STROKE
+//        // 默认 1dp
+//        strokeWidth = dp2px(1F).toFloat()
+//    }
 
     /** 文本 (默认空字符串) */
     private var mText = ""
 
-    /** 文本大小 (默认8sp) */
-    private var mTextSize = sp2px(8F).toFloat()
+    /** 文本大小 px值 */
+    private var mTextSize = -1F
+    /** 是否自定义文本大小  true:自定义  false:默认 */
+    private var mCustomTextSize = false
 
     /** 文本颜色 (默认纯白色) */
     @ColorInt
@@ -65,11 +78,15 @@ class MarkerView @JvmOverloads constructor(
     @ColorInt
     private var mBgColor = Color.RED
 
-    /** 圆角半径 (在圆角三角形样式下有效, 默认5dp) */
-    private var mCornerRadius = dp2px(5F).toFloat()
+    /** 圆角半径 px值 (在圆角三角形样式下有效) */
+    private var mCornerRadius = -1F
+    /** 是否自定义圆角半径  true:自定义  false:默认 */
+    private var mCustomCornerRadius = false
 
-    /** 缺失的三角形(整体的三角形缩小版)的腰长(等腰三角形) (在缺失三角形样式下有效, 默认5dp) */
-    private var mMissingTriangleWaistLength = dp2px(5F).toFloat()
+    /** 缺失的三角形(整体的三角形缩小版)的腰长 px值(等腰三角形) (在缺失三角形样式下有效) */
+    private var mMissingTriangleWaistLength = -1F
+    /** 是否自定义缺失的三角形的腰长  true:自定义  false:默认 */
+    private var mCustomMissingTriangleWaistLength = false
 
     /** 纵轴偏移距离 (小于0: 向上偏移  大于0: 向下偏移) */
     private var mOffset = 0F
@@ -85,19 +102,53 @@ class MarkerView @JvmOverloads constructor(
     init {
         context.obtainStyledAttributes(attrs, R.styleable.MarkerView).run {
             mText = getString(R.styleable.MarkerView_text) ?: ""
-            mTextSize = getDimension(R.styleable.MarkerView_textSize, sp2px(8F).toFloat())
+
+            try {
+                mTextSize = getDimensionOrThrow(R.styleable.MarkerView_textSize)
+                mCustomTextSize = true
+            } catch (e: IllegalArgumentException) {
+                mCustomTextSize = false
+            }
+
             mTextColor = getColor(R.styleable.MarkerView_textColor, Color.WHITE)
             mBgColor = getColor(R.styleable.MarkerView_bgColor, Color.RED)
-            mCornerRadius = getDimension(R.styleable.MarkerView_cornerRadius, dp2px(5F).toFloat())
-            mMissingTriangleWaistLength = getDimension(
-                R.styleable.MarkerView_missing_triangle_waist_length,
-                dp2px(5F).toFloat()
-            )
+
+            try {
+                mCornerRadius = getDimensionOrThrow(R.styleable.MarkerView_cornerRadius)
+                mCustomCornerRadius = true
+            } catch (e: IllegalArgumentException) {
+                mCustomCornerRadius = false
+            }
+
+            try {
+                mMissingTriangleWaistLength = getDimensionOrThrow(R.styleable.MarkerView_missing_triangle_waist_length)
+                mCustomMissingTriangleWaistLength = true
+            } catch (e: IllegalArgumentException) {
+                mCustomMissingTriangleWaistLength = false
+            }
+
             mOffset = getDimension(R.styleable.MarkerView_offset, 0F)
             mPosition = getInt(R.styleable.MarkerView_position, POSITION_LEFT_TOP)
             mStyle = getInt(R.styleable.MarkerView_marker_view_style, STYLE_TRIANGLE)
             //一定要回收，否则会内存泄漏
             recycle()
+        }
+    }
+
+    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
+        super.onLayout(changed, left, top, right, bottom)
+        val width = width.toFloat()
+        val height = height.toFloat()
+        val size = if (width > height) height else width
+
+        if (!mCustomTextSize) {
+            mTextSize = size * DEFAULT_TEXT_SIZE_SCALE_VALUE
+        }
+        if (!mCustomCornerRadius) {
+            mCornerRadius = size * DEFAULT_CORNER_RADIUS_SCALE_VALUE
+        }
+        if (!mCustomMissingTriangleWaistLength) {
+            mMissingTriangleWaistLength = size * DEFAULT_MISSING_TRIANGLE_WAIST_LENGTH_SCALE_VALUE
         }
     }
 
@@ -426,8 +477,7 @@ class MarkerView @JvmOverloads constructor(
      * @param paint
      * @return
      */
-    private fun measureTextHeight(paint: Paint?) =
-        if (paint == null) 0F else paint.fontMetrics.descent - paint.fontMetrics.ascent
+    private fun measureTextHeight(paint: Paint?) = if (paint == null) 0F else paint.fontMetrics.descent - paint.fontMetrics.ascent
 
     /**
      * 设置文本
@@ -454,6 +504,7 @@ class MarkerView @JvmOverloads constructor(
         get() = this.mTextSize
         set(textSize) {
             this.mTextSize = textSize
+            this.mCustomTextSize = true
         }
 
     /**
@@ -472,6 +523,7 @@ class MarkerView @JvmOverloads constructor(
         get() = this.mCornerRadius
         set(cornerRadius) {
             this.mCornerRadius = cornerRadius
+            this.mCustomCornerRadius = true
         }
 
     /**
@@ -481,6 +533,7 @@ class MarkerView @JvmOverloads constructor(
         get() = this.mMissingTriangleWaistLength
         set(missingTriangleWaistLength) {
             this.mMissingTriangleWaistLength = missingTriangleWaistLength
+            this.mCustomMissingTriangleWaistLength = true
         }
 
     /**

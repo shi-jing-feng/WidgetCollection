@@ -4,10 +4,12 @@ import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
+import android.util.Log.e
 import com.shijingfeng.library.annotation.define.FlowGravity
 import com.shijingfeng.library.annotation.define.FlowOrientation
 import com.shijingfeng.library.widget.FlowLayout
 import com.shijingfeng.widget_collection.util.dp2px
+import com.shijingfeng.widget_collection.util.sp2px
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
