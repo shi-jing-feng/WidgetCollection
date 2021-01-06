@@ -127,7 +127,7 @@
             <enum name="horizontal" value="1" />
         </attr>
         <!-- Child所处的位置 -->
-        <attr name="flowGravity" format="enum">
+        <attr name="flowGravity" format="flags">
             <!-- Child所处的位置: {@link FlowOrientation#HORIZONTAL}: 水平居中  {@link FlowOrientation#VERTICAL}: 垂直居中 -->
             <enum name="center" value="0" />
             <!-- Child所处的位置: 顶部  用于{@link FlowOrientation#VERTICAL} -->

@@ -427,4 +427,22 @@ class FlowLayout @JvmOverloads constructor(
             this.mGravity = gravity
         }
 
+    /**
+     * 获取 和 设置 行间隔 (注: 会和 topMargin, bottomMargin 叠加)
+     */
+    var rawSpace: Int
+        get() = mRawSpace
+        set(rawSpace) {
+            this.mRawSpace = rawSpace
+        }
+
+    /**
+     * 列间隔 (注: 会和 leftMargin(getMarginStart()), rightMargin(getMarginEnd()) 叠加)
+     */
+    var columnSpace: Int
+        get() = mColumnSpace
+        set(columnSpace) {
+            this.mColumnSpace = columnSpace
+        }
+
 }
