@@ -10,6 +10,10 @@
     <attr name="cornerRadius" format="dimension|reference" />
     <!-- 颜色 -->
     <attr name="color" format="color|reference" />
+    <!-- 阴影颜色 -->
+    <attr name="shadowColor" format="color|reference" />
+    <!-- 阴影半径 -->
+    <attr name="shadowRadius" format="dimension|reference" />
 
     <!-- 进度环 -->
     <declare-styleable name="ProgressRing">
@@ -127,7 +131,7 @@
             <enum name="horizontal" value="1" />
         </attr>
         <!-- Child所处的位置 -->
-        <attr name="flowGravity" format="flags">
+        <attr name="flowGravity" format="enum">
             <!-- Child所处的位置: {@link FlowOrientation#HORIZONTAL}: 水平居中  {@link FlowOrientation#VERTICAL}: 垂直居中 -->
             <enum name="center" value="0" />
             <!-- Child所处的位置: 顶部  用于{@link FlowOrientation#VERTICAL} -->
@@ -172,13 +176,13 @@
         <!-- 是否显示阴影  true: 显示  false: 不显示 -->
         <attr name="showShadow" format="boolean" />
         <!-- 阴影半径 -->
-        <attr name="shadowRadius" format="dimension|reference" />
+        <attr name="shadowRadius" />
         <!-- 阴影水平偏移量 (正值向右偏移，负值向左偏移) -->
         <attr name="shadowDx" format="dimension|reference" />
         <!-- 阴影垂直偏移量 (正值向下偏移，负值向上偏移) -->
         <attr name="shadowDy" format="dimension|reference" />
         <!-- 阴影颜色 -->
-        <attr name="shadowColor" format="color|reference" />
+        <attr name="shadowColor" />
     </declare-styleable>
     
     <!-- 粒子扩散效果 View (仿网易云空灵轻音特效) -->
@@ -187,6 +191,22 @@
         <attr name="radius" format="dimension|reference" />
         <!-- 颜色 -->
         <attr name="color" />
+    </declare-styleable>
+
+    <!-- 阴影卡片View -->
+    <declare-styleable name="ShadowCardView">
+        <!-- 阴影颜色 -->
+        <attr name="shadowColor" />
+        <!-- 阴影半径 -->
+        <attr name="shadowRadius" />
+        <!-- 阴影X轴偏移距离, 大于0向右偏移, 小于0向左偏移, 等于0不偏移 -->
+        <attr name="shadowOffsetX" format="dimension|reference" />
+        <!-- 阴影Y轴偏移距离, 大于0向下偏移, 小于0向上偏移, 等于0不偏移 -->
+        <attr name="shadowOffsetY" format="dimension|reference" />
+        <!-- 圆角半径 -->
+        <attr name="cornerRadius" />
+        <!-- 是否开启阴影  true:开启  false:关闭 -->
+        <attr name="enableShadow" format="boolean" />
     </declare-styleable>
 
 </resources>
