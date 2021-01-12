@@ -1,20 +1,13 @@
-package com.shijingfeng.library.widget
+package com.shijingfeng.widget_collection.widget
 
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
-import android.graphics.RectF
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.widget.FrameLayout
-import androidx.core.view.marginBottom
-import androidx.core.view.marginEnd
-import androidx.core.view.marginStart
-import androidx.core.view.marginTop
-import com.shijingfeng.library.R
-import com.shijingfeng.library.annotation.define.FlowGravity
-import com.shijingfeng.library.annotation.define.FlowOrientation
+import com.shijingfeng.widget_collection.R
 import java.lang.IllegalArgumentException
 
 /** 默认阴影颜色 */
