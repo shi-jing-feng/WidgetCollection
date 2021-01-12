@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context="com.shijingfeng.app.MainActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -17,7 +17,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <com.shijingfeng.library.widget.ProgressRing
+            <com.shijingfeng.widget_collection.widget.ProgressRing
                 android:layout_width="65dp"
                 android:layout_height="65dp"
                 android:layout_marginEnd="15dp"
@@ -35,7 +35,7 @@
                 app:thickness="7dp"
                 app:totalProgress="100" />
 
-            <com.shijingfeng.library.widget.MarkerView
+            <com.shijingfeng.widget_collection.widget.MarkerView
                 android:id="@+id/marker_view"
                 android:layout_width="65dp"
                 android:layout_height="65dp"
@@ -44,7 +44,7 @@
                 app:marker_view_style="cornerTriangle"
                 app:text="重要" />
 
-            <com.shijingfeng.library.widget.IsoscelesTriangleView
+            <com.shijingfeng.widget_collection.widget.IsoscelesTriangleView
                 android:layout_width="65dp"
                 android:layout_height="65dp"
                 app:color="@color/colorPrimaryDark"
@@ -52,7 +52,7 @@
 
         </LinearLayout>
 
-        <com.shijingfeng.library.widget.LinearLayout
+        <com.shijingfeng.widget_collection.widget.LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
@@ -85,9 +85,9 @@
                 android:padding="10dp"
                 android:text="第三行" />
 
-        </com.shijingfeng.library.widget.LinearLayout>
+        </com.shijingfeng.widget_collection.widget.LinearLayout>
 
-        <com.shijingfeng.library.widget.FlowLayout
+        <com.shijingfeng.widget_collection.widget.FlowLayout
             android:id="@+id/fl_one"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -141,13 +141,13 @@
                 android:padding="20dp"
                 android:text="哈哟广大后的古哦哈够爱会搞混后i阿红改好后后好贵啊gap干哈后i更好欧鸿啊哦吼干哈红红" />
 
-        </com.shijingfeng.library.widget.FlowLayout>
+        </com.shijingfeng.widget_collection.widget.FlowLayout>
 
         <!--        <HorizontalScrollView-->
         <!--            android:layout_width="match_parent"-->
         <!--            android:layout_height="wrap_content">-->
 
-        <!--            <com.shijingfeng.library.widget.FlowLayout-->
+        <!--            <widget_collectioncollection.widget.FlowLayout-->
         <!--                android:id="@+id/fl_two"-->
         <!--                android:layout_width="wrap_content"-->
         <!--                android:layout_height="200dp"-->
@@ -204,11 +204,11 @@
         <!--                    android:layout_height="300dp"-->
         <!--                    android:background="#AAAAAA" />-->
 
-        <!--            </com.shijingfeng.library.widget.FlowLayout>-->
+        <!--            </widget_collectioncollection.widget.FlowLayout>-->
 
         <!--        </HorizontalScrollView>-->
 
-        <com.shijingfeng.library.widget.BubbleBackgroundView
+        <com.shijingfeng.widget_collection.widget.BubbleBackgroundView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
@@ -238,9 +238,9 @@
                 android:background="#FFFF00"
                 android:text="啥iOS更好" />
 
-        </com.shijingfeng.library.widget.BubbleBackgroundView>
+        </com.shijingfeng.widget_collection.widget.BubbleBackgroundView>
 
-        <com.shijingfeng.library.widget.ParticleDiffuseView
+        <com.shijingfeng.widget_collection.widget.ParticleDiffuseView
             android:id="@+id/particle_diffuse_view"
             android:layout_width="350dp"
             android:layout_height="350dp"
