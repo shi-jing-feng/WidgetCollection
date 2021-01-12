@@ -10,7 +10,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="15dp">
+        android:padding="15dp"
+        android:scrollY="800dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -248,6 +249,20 @@
             android:background="#000000"
             app:color="#FF0000"
             app:radius="50dp" />
+
+        <com.shijingfeng.library.widget.ShadowCardView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            app:shadowRadius="5dp"
+            app:shadowColor="#696969">
+
+            <View
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:background="#FF0000"/>
+
+        </com.shijingfeng.library.widget.ShadowCardView>
 
     </LinearLayout>
 
