@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- LinearDividerItemDecoration 当前绝对Position (相对于所有的Item, 包括可见的和不可见的) -->
+    <item name="current_position" type="id" />
+    <!-- GridDividerItemDecoration 总行数 -->
+    <item name="total_raw" type="id" />
+    <!-- GridDividerItemDecoration 总列数 -->
+    <item name="total_column" type="id" />
+    <!-- GridDividerItemDecoration 当前Item所处的绝对行数 (相对于所有的Item, 包括可见的和不可见的) -->
+    <item name="current_raw" type="id" />
+    <!-- GridDividerItemDecoration 当前Item所处的绝对列数 (相对于所有的Item, 包括可见的和不可见的) -->
+    <item name="current_column" type="id" />
+</resources>
